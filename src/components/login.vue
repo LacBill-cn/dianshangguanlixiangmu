@@ -18,7 +18,7 @@
             </el-form-item>
             <!-- 按钮区 -->
             <el-form-item class="btns">
-            <el-button type="primary">
+            <el-button type="primary" @click="login">
                 登录
             </el-button>
             <el-button type="info" @click="resetLoginForm">
@@ -36,8 +36,8 @@ export default {
         return{
             //登录表单的数据绑定对象
             loginForm:{
-                username:'',
-                password:''
+                username:'admin',
+                password:'123456'
             },
             //验证表单规则对象
             loginFormRules:{
@@ -49,7 +49,7 @@ export default {
                 //验证密码
                 password:[
                     { required: true, message: '请输入登录密码', trigger: 'blur' },
-                     { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
+                     { min: 3, max: 15, message: '长度在 3 到 15 个字符', trigger: 'blur' }
                 ]
         }
         }
@@ -58,7 +58,24 @@ export default {
         //点击重置按钮，重置表单
         resetLoginForm(){
             this.$refs.loginFormRef.resetFields();
-            
+
+        },
+        login(){
+            this.$refs.loginFormRef.validate(async(valid)=>{
+                if(!valid) return;
+               const result = await this.$http.post('login',this.loginForm)
+               const res = result.data
+               console.log(res)
+               if(res.meta.status !==200){
+                   this.$message.error('登录失败');
+               }
+               else{
+                   this.$message.success('登录成功')
+                   window.sessionStorage.setItem("token",res.data.token)
+                   this.$router.push("/home")
+               }
+               
+            })
         }
     }
     
